@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     <style>
-    img {width: 1000px;}
+    img {width: 100%;}
+    .container {display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 25px;
+    grid-row-gap: 25px;
+    }
     </style>
     <py-config type="json">
       {
@@ -24,8 +29,7 @@
   </head>
   <body>
     <p>
-      This example shows how to process a input file event, use opencv to
-      convert to grayscale, and display the content as an image.
+      This is a demonstration of real-time car license plate masking using openCv in a browser.
     </p>
     <br />
     <label for="myfiles">Select image(s)</label>
@@ -33,10 +37,11 @@
 
     <br />
     <br />
-    <p>Images:</p>
+   <div class="container">
+    <div id="original"></div>
     <div id="images">
-    </div>
-
+   </div>
+   
     <py-script>
 import subprocess
 import asyncio
@@ -81,6 +86,7 @@ def bytes_to_data_url(img_bytes):
     return f'data:image/jpg;base64,{b64_encoded}'
 
 def read_complete(event):
+  originalData = readb64(event.target.result)
   imageCv = readb64(event.target.result)
   gray = cv2.cvtColor(imageCv, cv2.COLOR_BGR2GRAY)
   bilateral = cv2.bilateralFilter(gray, 11, 17, 17)
@@ -105,7 +111,16 @@ def read_complete(event):
   
   # save result
   crop_data_url = bytes_to_data_url(tempContours3)
+  
+  original = document.getElementById("original")
+  name1 = document.createElement("div")
+  name1.innerHTML = 'original image' 
+  original.appendChild(name1)
 
+  img1 = document.createElement("img")
+  img1.src = bytes_to_data_url(originalData)
+  original.appendChild(img1)
+  
   images = document.getElementById("images")
 
   name = document.createElement("div")
@@ -144,4 +159,3 @@ setup()
     </py-script>
   </body>
 </html>
-
